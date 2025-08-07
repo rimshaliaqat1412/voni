@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angelia's Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('back.jpeg');
+            background-position: 50% 15%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: scroll;
+            overflow: hidden auto;
+            max-height: 100%;
+            color: #fff;
+            height: 100vh;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            width: 90%;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: clamp(15px, 3vw, 30px);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            color: #87CEEB;
+            text-decoration: none;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            color: #B0E2FF;
+        }
+
+        .nav-item.active {
+            color: #B0E2FF;
+            font-weight: 600;
+            border-bottom: 2px solid #B0E2FF;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .profile-content {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            margin-left: 10px;
+            flex-wrap: wrap;
+        }
+
+        .avatar {
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            border-radius: 50%;
+            margin-right: 20px;
+            background-image: url('profile.jpeg');
+            background-size: cover;
+            background-position: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .profile-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-title {
+            color: #87CEEB;
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .contact-info {
+            color: #87CEEB;
+            font-size: clamp(12px, 2.5vw, 14px);
+            text-align: left;
+            opacity: 0.9;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: left;
+            gap: clamp(1px, 1vw, 1px);
+            margin-bottom: 40px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: clamp(32px, 8vw, 40px);
+            height: clamp(32px, 8vw, 40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .social-icon svg {
+            width: clamp(16px, 4vw, 20px);
+            height: clamp(16px, 4vw, 20px);
+            fill: #87CEEB;
+        }
+
+        .category-section {
+            display: none;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .category-section.active {
+            display: flex;
+        }
+
+        .category-wrapper {
+            position: relative;
+        }
+
+        .category-item {
+            background-color: rgba(49, 126, 170, 0.29);
+            border-radius: 25px;
+            padding: 16px;
+            color: #83d6fa;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -.42px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            --Paper-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);
+            box-shadow: none;
+            border: 0px;
+        }
+
+        .category-item span {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            border-right: 2px solid #87CEEB;
+            border-bottom: 2px solid #87CEEB;
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-arrow.open {
+            transform: rotate(225deg);
+        }
+
+        .dropdown-links {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .dropdown-links.open {
+            max-height: 1000px;
+        }
+
+        .dropdown-links a {
+            display: block;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 18px 25px;
+            margin: 14px 0;
+            color: #87CEEB;
+            text-decoration: none;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .dropdown-links a:hover {
+            color: #B0E2FF;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .beacons-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(12px, 2.5vw, 14px);
+            font-weight: 600;
+            color: #87CEEB;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .beacons-icon {
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .beacons-icon::before {
+            content: '✦';
+            color: #87CEEB;
+            font-size: 12px;
+        }
+
+        .share-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #87CEEB;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .nav-bar {
+                gap: 15px;
+            }
+
+            .nav-item {
+                font-size: clamp(12px, 2.5vw, 14px);
+            }
+
+            .profile-content {
+                display: flex;
+                align-items: center;
+                margin-left: 10px;
+            }
+
+            .avatar {
+                margin-right: 20px;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                gap: 10px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .nav-item {
+                font-size: clamp(12px, 3vw, 13px);
+                padding: 10px;
+            }
+
+            .profile-title {
+                font-size: clamp(18px, 4vw, 20px);
+            }
+
+            .contact-info {
+                font-size: clamp(11px, 2.5vw, 12px);
+            }
+
+            .social-icon {
+                width: clamp(28px, 7vw, 36px);
+                height: clamp(28px, 7vw, 36px);
+            }
+
+            .social-icon svg {
+                width: clamp(14px, 3.5vw, 18px);
+                height: clamp(14px, 3.5vw, 18px);
+            }
+
+            .category-item {
+                font-size: clamp(13px, 2.5vw, 14px);
+                padding: 15px 20px;
+            }
+
+            .dropdown-links a {
+                font-size: clamp(13px, 2.5vw, 14px);
+                padding: 15px 20px;
+            }
+
+            .beacons-badge {
+                font-size: clamp(11px, 2.5vw, 12px);
+                padding: 6px 12px;
+            }
+
+            .profile-content {
+                display: flex;
+                align-items: center;
+                margin-left: 10px;
+            }
+
+            .avatar {
+                margin-right: 20px;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .nav-bar {
+                gap: 8px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .nav-item {
+                font-size: clamp(11px, 3vw, 12px);
+                padding: 8px;
+            }
+
+            .avatar {
+                width: clamp(50px, 12vw, 60px);
+                height: clamp(50px, 12vw, 60px);
+                margin-right: 15px;
+            }
+
+            .profile-title {
+                font-size: clamp(16px, 4vw, 18px);
+            }
+
+            .contact-info {
+                font-size: clamp(10px, 2.5vw, 11px);
+            }
+
+            .social-icons {
+                gap: 4px;
+            }
+
+            .social-icon {
+                width: clamp(24px, 6vw, 32px);
+                height: clamp(24px, 6vw, 32px);
+            }
+
+            .social-icon svg {
+                width: clamp(12px, 3vw, 16px);
+                height: clamp(12px, 3vw, 16px);
+            }
+
+            .category-item {
+                font-size: clamp(12px, 2.5vw, 13px);
+                padding: 12px 15px;
+            }
+
+            .dropdown-links a {
+                font-size: clamp(12px, 2.5vw, 13px);
+                padding: 12px 15px;
+            }
+
+            .beacons-badge {
+                bottom: 10px;
+                right: 10px;
+                font-size: clamp(10px, 2.5vw, 11px);
+                padding: 5px 10px;
+            }
+
+            .share-btn {
+                font-size: clamp(12px, 2.5vw, 14px);
+                padding: 8px 16px;
+            }
+
+            .profile-content {
+                display: flex;
+                align-items: center;
+                margin-left: 10px;
+            }
+
+            .avatar {
+                margin-right: 15px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    
+    <div class="container">
+        <nav class="nav-bar">
+            <a class="nav-item active" data-section="shoes">Shoes</a>
+            <a class="nav-item" data-section="clothes">Clothes</a>
+            <a class="nav-item" data-section="bags-watches">Bags+Watches</a>
+            <a class="nav-item" data-section="accessories">Accessories</a>
+            <a class="nav-item" data-section="electronics">Electronics</a>
+        </nav>
+
+        <div class="profile-section">
+            <div class="profile-content">
+                <div class="avatar"></div>
+                <div class="profile-text">
+                    <h1 class="profile-title">Voni's Catalog</h1>
+                    <p class="contact-info">
+                        Contact my WhatsApp:
+                        <a href="https://wa.me/15106609281" target="_blank" style="color: inherit; text-decoration: underline;">
+                          +1 510 660 9281
+                        </a>
+                      </p>
+                </div>
+            </div>
+            
+            <div class="social-icons">
+                <div class="social-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-.943-.249-.074-.498-.272-.697-.57-.347-.297-.894-.645-1.042-.719zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.63z"/>
+                    </svg>
+                </div>
+                <div class="social-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                    </svg>
+                </div>
+                <div class="social-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h.91L12 10.09l9.455-6.269h.909c.904 0 1.636.732 1.636 1.636z"/>
+                    </svg>
+                </div>
+                <div class="social-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </div>
+                <div class="social-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0002 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section active" id="shoes">
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Air Jordan</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://funteams.x.yupoo.com/categories/87689?isSubCate=true">Air Jordan 1 Low</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87690?isSubCate=true">Air Jordan 1 Mid</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87687?isSubCate=true">Air Jordan 1 High</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87691?isSubCate=true">Air Jordan 3</a>
+                    <a href="https://911xtl.x.yupoo.com/categories/418162">Air Jordan 4</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87694?isSubCate=true">Air Jordan 5</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87695?isSubCate=true">Air Jordan 6</a>
+                    <a href="https://911xtl.x.yupoo.com/categories/418288">Air Jordan 11</a>
+                    <a href="https://911xtl.x.yupoo.com/categories/418303">Air Jordan 12</a>
+                    <a href="https://911xtl.x.yupoo.com/categories/418315">Air Jordan 13</a>
+                    <a href="https://funteams.x.yupoo.com/categories/87692?isSubCate=true">Air Jordan Legacy 312 Low</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Luxury Brand</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="#">Louis Vuitton+Gucci+Dior+Prada+HERMES+DOLCE & GABBANA+Valentino+Christian Louboutin+Givenchy+Burberry</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Fashion Brands</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://ghxy.x.yupoo.com/categories/1916775">Alexander McQueen Women</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2787985">Alexander McQueen Men</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2756673">Versace Women</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2756673">Versace Men</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2787983">Armani</a>
+                    <a href="https://no1factory.x.yupoo.com/categories/3922720">Lanven</a>
+                    <a href="https://funteams.x.yupoo.com/categories/4174728">Rick Ovens</a>
+                    <a href="https://funteams.x.yupoo.com/categories/4174728">Fear Of God</a>
+                    <a href="https://funteams.x.yupoo.com/categories/4046727">AMIRI</a>
+                    <a href="https://funteams.x.yupoo.com/categories/4046727">GGDB</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2787988">Giuseppe Zanotti</a>
+                    <a href="https://brandgift.x.yupoo.com/search/album?uid=1&sort=&q=Loro+Piana">Loro Piana</a>
+                    <a href="https://ghxy.x.yupoo.com/categories/2787992">PHILLIPE PIEIN</a>
+                    <a href="https://youki0131.x.yupoo.com/categories/4277732">Converse</a>
+                    <a href="https://youki0131.x.yupoo.com/categories/4277732">VANS</a>
+                    <a href="https://youki0131.x.yupoo.com/categories/4277732">Salomon</a>
+                    <a href="https://youki0131.x.yupoo.com/categories/4277732">UUG</a>
+                    <a href="https://youki0131.x.yupoo.com/categories/4277732">Hoka</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Basketball Shoes</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://18666.x.yupoo.com/categories/3266647">Kobe</a>
+                    <a href="https://18666.x.yupoo.com/categories/3265636">Kyrie</a>
+                    <a href="https://18666.x.yupoo.com/categories/3265788">PG</a>
+                    <a href="https://18666.x.yupoo.com/categories/3706888">GT CUT</a>
+                    <a href="https://18666.x.yupoo.com/categories/3269079">Harden</a>
+                    <a href="https://18666.x.yupoo.com/categories/4378210">Air More UPtempo</a>
+                    <a href="https://18666.x.yupoo.com/categories/3265833">LeBorn</a>
+                    <a href="https://18666.x.yupoo.com/categories/4446395">Anthony Edwards</a>
+                    <a href="https://18666.x.yupoo.com/categories/4082485">KD</a>
+                    <a href="https://18666.x.yupoo.com/categories/4373622">DevinBooker</a>
+                    <a href="https://18666.x.yupoo.com/categories/3265814">Giannis Imortality</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>NIKE</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://funteams.x.yupoo.com/categories/2729958">SB Dunck</a>
+                    <a href="https://funteams.x.yupoo.com/categories/2729958">Air Force 1</a>
+                    <a href="https://funteams.x.yupoo.com/categories/3009540">Sacai</a>
+                    <a href="https://funteams.x.yupoo.com/categories/94710?isSubCate=true">Pegasas</a>
+                    <a href="https://funteams.x.yupoo.com/categories/94703?isSubCate=true">Zoom Fly</a>
+                    <a href="https://funteams.x.yupoo.com/categories/2690787">Air More UTempo</a>
+                    <a href="https://gm1688.x.yupoo.com/categories/3453262">TN</a>
+                    <a href="https://gm1688.x.yupoo.com/categories/4432482">Air MAX</a>
+                    <a href="https://gm1688.x.yupoo.com/categories/3909262">Air Max Plus</a>
+                    <a href="https://gm1688.x.yupoo.com/categories/4432482">Zoom</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Adidas</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://lol2021.x.yupoo.com/categories/4372466">Yeezy 350</a>
+                    <a href="https://lol2021.x.yupoo.com/categories/3916008">Yeezy 500</a>
+                    <a href="https://lol2021.x.yupoo.com/categories/3916008">Yeezy 700</a>
+                    <a href="https://funteams.x.yupoo.com/categories/89286?isSubCate=true">Yeezy Slide</a>
+                    <a href="https://funteams.x.yupoo.com/categories/89286?isSubCate=true">Ultra Boost</a>
+                    <a href="https://funteams.x.yupoo.com/categories/89286?isSubCate=true">Samba</a>
+                    <a href="https://funteams.x.yupoo.com/categories/3933529">Forum</a>
+                    <a href="https://funteams.x.yupoo.com/categories/3933529">Gazelle</a>
+                    <a href="https://funteams.x.yupoo.com/categories/3933529">Responce</a>
+                    <a href="https://funteams.x.yupoo.com/categories/3933529">SuperStart</a>
+                    <a href="https://beacons.ai/catalog_">Handballs Spzl</a>
+                    <a href="https://funteams.x.yupoo.com/categories/288525?isSubCate=true">Campus</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Balanciaga</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Track Trainer</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Speed Trainer</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Runner</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Triple S</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Phantom 3XL</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274871?isSubCate=true">Track 2</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">Defender</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">Cargo</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">Stapler</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>New Balance</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">NB 9060</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">NB 2002 R</a>
+                    <a href="https://funteams.x.yupoo.com/categories/274876?isSubCate=true">NB 990</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273981?isSubCate=true">NB 991</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273982?isSubCate=true">NB 992</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273984?isSubCate=true">NB 997</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273989?isSubCate=true">NB 327</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273995?isSubCate=true">NB 530</a>
+                    <a href="https://funteams.x.yupoo.com/categories/273997?isSubCate=true">NB 550</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section" id="clothes">
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Luxury Brand</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://miao2017.x.yupoo.com/categories/655370">Louis Vuitton</a>
+                    <a href="https://chaopaimallcloth.x.yupoo.com/categories/4012117">Gucci</a>
+                    <a href="https://mefashion2.x.yupoo.com/albums/124056021?uid=1&isSubCate=false&referrercate=3057664">Chanel</a>
+                    <a href="https://no1factory.x.yupoo.com/categories/3269467?page=4">Prada</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914012">Dior</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/4327636">Fendi</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914006">DOLCE & GABBANA</a>
+                    <a href="https://no1factory.x.yupoo.com/categories/862056">Monceler</a>
+                    <a href="https://no1factory.x.yupoo.com/categories/862056">Berbery</a>
+                    <a href="https://dyoomall.x.yupoo.com/categories/3456316">Balancaiga</a>
+                    <a href="https://shoeghost.x.yupoo.com/categories/4541473">Vercase</a>
+                    <a href="https://luxury999designer.x.yupoo.com/categories/3926331">BALMAIN Men</a>
+                    <a href="https://luxury999designer.x.yupoo.com/categories/3925494">BALMAIN Women</a>
+                    <a href="https://luxury999designer.x.yupoo.com/categories/3925494">Givenchy</a>
+                    <a href="https://number-top1.x.yupoo.com/albums/175981836?uid=1">Loewe</a>
+                    <a href="https://mixluxury.x.yupoo.com/categories/4308346">Celine</a>
+                    <a href="https://mixluxury.x.yupoo.com/categories/4308346">Miumiu</a>
+                    <a href="https://mixluxury.x.yupoo.com/categories/4308346">Arcteryx</a>
+                    <a href="https://mixluxury.x.yupoo.com/categories/4308346">Fear Of God</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Fashion Brand</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/4276137">Sp5der</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913983">Amiri</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914018">Ami Paris</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914008">Aape</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914008">ANTI SOCIAL SOCIAL CLUB</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914033">Air Jordan</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913980">Askyurself</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913980">Armani</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913978">Adidas</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913978">Acne Studios</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3971125">ARC`TERYX</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914035">Alexender McQueen</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914035">Boss</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914035">Bape</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914035">Balmain</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Down Jacket</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Prada Women</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Prada Man</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Prada</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Fendi</a>
+                    <a href="https://linger1988.x.yupoo.com/categories/8376?isSubCate=true">Burberry</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Moncler</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Moncler Man</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Moncler Women</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Canada Goose Man</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Canada Goose Women</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Canada Goose</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">The North Face</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">The North Face</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Moose Kunckles Man</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Nike Man</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Nike Women</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Adidas Man</a>
+                    <a href="https://lingxingyu.x.yupoo.com/categories/3420106">Adidas Women</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Baseball Jacket</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3915755">Louis Vuitton</a>
+                    
+                    
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Windbreaker</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3929912">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3929912">Many Brands Man</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3929912">Many Brands Women</a>
+                    
+                    
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>T-Shirt</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914069">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914069">Louis Vuitton</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914069">Gucci</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Balangsaiga</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Armani</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Moschino</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Nike Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Nike Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Adidas Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474937">Adidas Women</a>
+                    <a href="https://ustradeclothes.x.yupoo.com/categories/20919?isSubCate=true&page=1">Off white</a>
+                       
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Polo Shirts</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914070">Short Sleeve polo</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914070">Long Sleeve Polo</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914070">Many Brands Suit</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Shirts</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914069">Many Brands</a>
+                    <a href="https://407131796.x.yupoo.com/categories/50578?isSubCate=true&page=1">Long Sleeve shirt</a>
+                    <a href="https://new666.x.yupoo.com/categories/3868082">Louis Vuitton</a>
+                    <a href="https://new666.x.yupoo.com/categories/4068875">DIOR</a>
+                    <a href="https://new666.x.yupoo.com/categories/3868562">Versace</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Long Sleeve</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3310372">Many Brands</a>
+                    <a href="https://new666.x.yupoo.com/categories/4319039">Louis Vuitton</a>
+                    <a href="https://new666.x.yupoo.com/categories/4319039">GUCCI</a>
+                    <a href="https://new666.x.yupoo.com/categories/4319039">Armani</a>
+                    <a href="https://new666.x.yupoo.com/categories/4319039">Burberry</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Track Suit</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914516">Many Brands</a>
+                    <a href="https://aobiao.x.yupoo.com/categories/">Foodball Jersey</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3913989">NBA Jersey</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Shorts</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914519">Many Brands</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451654">Nike Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451654">Nike Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474798">Adidas Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474798">Adidas Women</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Pants</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914527">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914072">Jeans</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914072">Casual Pants</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3914072">Louis Vuitton</a>
+                    <a href="https://new666.x.yupoo.com/categories/3548170">Gucci</a>
+                    <a href="https://new666.x.yupoo.com/categories/3548144">DIOR</a>
+                    <a href="https://new666.x.yupoo.com/categories/3548144">Burberry</a>
+                    <a href="https://new666.x.yupoo.com/categories/3548130">Balangsaiga</a>
+                    <a href="https://new666.x.yupoo.com/categories/3548130">Armain</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451172">Nike Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451650">Nike Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474840">Adidas Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474811">Adidas Women</a>
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Hoodies/SweatShirt</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3885387">Many Brands</a>
+                    <a href="https://mujichaopaia.x.yupoo.com/categories/3951906">Seat Shirt</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451116">Nike Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451177">Nike Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3478781">Adidas Man</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474839">Adidas Women</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Sweater</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3296162">Many Brands</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242401?isSubCate=true">Louis Vuitton</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242404?isSubCate=true">GUCCI</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451177">Berbery</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242408?isSubCate=true">DIOR</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242412?isSubCate=true">Versace</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242402?isSubCate=true">Balancaiga</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242406?isSubCate=true">Thom Browne</a>
+                    <a href="https://af5800cc.x.yupoo.com/categories/242405?isSubCate=true">Chrome Heart</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Coat</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://ccgdstudio88.x.yupoo.com/categories/3161061?page=2">Many Brands</a>
+                    <a href="https://jmshop88.x.yupoo.com/categories/4667606?page=1">Denimm Jacket</a>
+                    <a href="https://407131796.x.yupoo.com/categories/273351?isSubCate=true&page=2">Jackets</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3478741">Nike Men</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451256">Nike Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474873">Adidas Men</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474823">Adidas Women</a>
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Skirt</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://adnkdu.x.yupoo.com/categories/3478434">Nike Women</a>  
+                </div>
+            </div>
+
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Legging/Yoga/Exercise</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451651">Nike Yoga</a>  
+                    <a href="https://adnkdu.x.yupoo.com/categories/3474805">Adidas Women</a>
+                    <a href="https://adnkdu.x.yupoo.com/categories/3451178">Nike Women</a>
+                </div>
+            </div>  
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Matching Top and pants</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3283194?page=3">Many Brands</a>  
+                    <a href="https://407131796.x.yupoo.com/categories/3283194?page=3">Short Sleeves Shirt</a>
+                    <a href="https://407131796.x.yupoo.com/categories/3283194?page=3">Nike Adidas</a>
+                </div>
+            </div>  
+
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Womens Underwear</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://af5800cc.x.yupoo.com/categories/4557270?page=1">Mens Underwear</a> 
+                </div>
+            </div>  
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Children's Clothing</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://af5800cc.x.yupoo.com/categories/4413331">Many brands</a> 
+                </div>
+            </div>  
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Many Brands Women</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3151502?page=1">Many brands women</a> 
+                </div>
+            </div>  
+
+
+        </div>
+
+        <div class="category-section" id="bags-watches">
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Luxury Brands Watches</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://407131796.x.yupoo.com/categories/3151502?page=1">Rolex</a>
+                    <a href="https://watch8866watch.x.yupoo.com/categories/4128794">Patek PHILLIPE</a>
+                    <a href="https://qwe123123456.x.yupoo.com/categories/3966285">Omega</a>
+                    <a href="https://dyoomall.x.yupoo.com/categories/3558183">Cartier</a>
+                    <a href="https://number8store.x.yupoo.com/categories/3000771">Armani</a>
+                    <a href="http://x.yupoo.com/photos/117034687/categories/531017">Farnck Muller</a>
+                    <a href="https://watch8866watch.x.yupoo.com/categories/4525081">Longiness</a>
+                    <a href="https://watch8866watch.x.yupoo.com/categories/4134054">Richard Miller</a>
+                    <a href="https://001qcshop.x.yupoo.com/collections/4347175">Panerai</a>
+                    <a href="https://spjy.x.yupoo.com/categories/4538927">Vacheron Constantin</a>
+                    <a href="https://spjy.x.yupoo.com/categories/216123">Piaget</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Luxury Brand Bags</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://jmp81314.x.yupoo.com/categories/805822 ">Louis Vuitton</a>
+                    <a href="https://jmp81314.x.yupoo.com/categories/805822">Louis Vuitton Man</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122834">Louis Vuitton Women</a>
+                    <a href="https://jmp81314.x.yupoo.com/categories/2820008">Gucci</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/116833?isSubCate=true">Gucci Women</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/116832?isSubCate=true">Gucci Men</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/3985551">Prada</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122828">Prada Women</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122822">Prada Man</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/3985548">DIOR</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122816">Burberry Man</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122813">Burberry Women</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122853">Versace Man</a>
+                    <a href="https://jypj.x.yupoo.com/categories/3908015">Hermens Women</a>
+                    <a href="https://jypj.x.yupoo.com/categories/3908030">Hermens Man</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/2889771">Balancaiga</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/4510861">The North Face</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122819">Coach</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122842">Armani</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/4531901">Chole</a>
+                    <a href="https://jmp81314.x.yupoo.com/categories/3717747">Valentino</a>
+                    <a href="https://hzsdl.x.yupoo.com/categories/3329052">Jordan</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/824746">Puma</a>
+                </div>
+            </div>
+
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Backpacks</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://jmp81314.x.yupoo.com/categories/3584253">Many brands</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/824750">Nike</a> 
+                    <a href="https://vipno1.x.yupoo.com/categories/824742">Adidas</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/824899">Converse</a>
+                </div>
+            </div>
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Sholder Bags</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://vipno1.x.yupoo.com/categories/3306728">Many brands</a>
+                    <a href="https://vipno1.x.yupoo.com/categories/3306728">Nike</a> 
+                    <a href="https://vipno1.x.yupoo.com/categories/3306752">Adidas</a>
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Handbag/Packet</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://jmp81314.x.yupoo.com/collections/3179912?page=2">Many Brands</a>
+                    <a href="https://jmp81314.x.yupoo.com/categories/3786937">Travel Bag</a> 
+                    <a href="https://brandgift.x.yupoo.com/categories/227307">Prada</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/227309">Chanel</a>
+                    <a href="https://hotbags.x.yupoo.com/categories/122852">Versace</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/227283">Fendi</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/363908">Balancaiga</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/3769361">Yves Saint Laurent</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/3985552">Goyards</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/227299">VALENTINO</a>
+                    <a href="https://brandgift.x.yupoo.com/categories/347982">miumiu</a>
+                    <a href="https://vogue818.x.yupoo.com/categories/4140537">Bottega Venta</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section" id="accessories">
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Luxury Brand Jewelry</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://brandgift.x.yupoo.com/categories/430615">Many Brand</a>
+                    <a href="https://351164.x.yupoo.com/categories/3349592">Louis Vuitton</a>
+                    <a href="https://351164.x.yupoo.com/categories/2943447">Gucci</a>
+                    <a href="https://351164.x.yupoo.com/categories/4623747">Chanel</a>
+                    <a href="https://banwu10.x.yupoo.com/categories/495144">BVLGARI</a>
+                    <a href="https://351164.x.yupoo.com/categories/3438460">HERMESS</a>
+                    <a href="https://351164.x.yupoo.com/categories/3888255">Balancaiga</a>
+                    <a href="https://351164.x.yupoo.com/categories/3769196">Prada</a>
+                    <a href="https://351164.x.yupoo.com/categories/3507771">Yves Saint Laurent</a>
+                    <a href="https://gyfz.x.yupoo.com/categories/227854">Van Cheef & Arpels</a>
+                    <a href="https://351164.x.yupoo.com/categories/3709446">Valentino</a>
+                    <a href="https://351164.x.yupoo.com/categories/2943483">Piaget</a>
+                    <a href="https://351164.x.yupoo.com/categories/4619344">Cartier</a>
+                    <a href="https://351164.x.yupoo.com/categories/4334674">Chopard</a>
+                    <a href="https://351164.x.yupoo.com/categories/4394299">APM MONACO</a>
+                    <a href="https://351164.x.yupoo.com/categories/3709419">Versace</a>
+                    <a href="https://351164.x.yupoo.com/categories/3567316">Chrome Heart</a>
+                    <a href="https://351164.x.yupoo.com/categories/3567316">Leowe</a>
+                    <a href="https://351164.x.yupoo.com/categories/4604648">Buccelleti</a>
+                    <a href="https://351164.x.yupoo.com/categories/4604648">Calvin Cavin</a>
+                    <a href="https://351164.x.yupoo.com/categories/3745114">Qeelin</a>
+                </div>
+            </div>
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>NeckLace</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://351164.x.yupoo.com/categories/83212?isSubCate=true">Many Brands</a>
+                    <a href="https://351164.x.yupoo.com/categories/83212?isSubCate=true">Louis Vuitton</a>
+                    <a href="https://351164.x.yupoo.com/categories/460868?isSubCate=true">Gucci</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/168285?isSubCate=true">DIOR</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/172749?isSubCate=true">Hermes</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/165621?isSubCate=true">Valentino</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/161600?isSubCate=true">Chanel</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/177656?isSubCate=true">Balancaiga</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189400?isSubCate=true">Burberry</a>
+                    <a href="https://351164.x.yupoo.com/categories/435015?isSubCate=true">Cartier</a>
+                    <a href="https://351164.x.yupoo.com/categories/308730?isSubCate=true">APN MONACO</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/173450?isSubCate=true">Versace</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181105?isSubCate=true">Prada</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187400?isSubCate=true">Tiffany & Co.</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/171129?isSubCate=true">Van Cleef &  Arpels</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187552?isSubCate=true">McQueen</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181138?isSubCate=true">Celien</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189419?isSubCate=true">Vivienne Westwood</a>
+
+                </div>
+            </div>
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>Ring</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://351164.x.yupoo.com/categories/83213?isSubCate=true">Louis Vuitton</a>
+                    <a href="https://351164.x.yupoo.com/categories/460869?isSubCate=true">Gucci</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/168289?isSubCate=true">DIOR</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189401?isSubCate=true">Burberry</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/165622?isSubCate=true">Valentino</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181107?isSubCate=true">Prada</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/172751?isSubCate=true">Hereme</a>
+                    <a href="https://351164.x.yupoo.com/categories/435018?isSubCate=true">Cartier</a>
+                    <a href="https://1688tian.x.yupoo.com/categories/174735?isSubCate=true">Van Cleef & Arpels</a>
+                    <a href="https://351164.x.yupoo.com/categories/308731?isSubCate=true">APM Monaco</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187402?isSubCate=true">Tiffany & Co.</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187554?isSubCate=true">MCQueen</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181140?isSubCate=true">Celine</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189421?isSubCate=true">Vivienne Westwood</a>
+                    
+                    
+                </div>
+            </div>
+
+                
+
+
+            <div class="category-wrapper">
+                <div class="category-item">
+                    <span>hand Jewelry</span>
+                    <div class="dropdown-arrow"></div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="https://paypalshop1.x.yupoo.com/albums/137127136?uid=1">Many Brands</a>
+                    <a href="https://351164.x.yupoo.com/categories/83211?isSubCate=true">Louis Vuitton</a>
+                    <a href="https://351164.x.yupoo.com/categories/460866?isSubCate=true">Gucci</a>
+                    <a href="https://alex8181688.x.yupoo.com/categories/408350?isSubCate=true">DIOR</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/177657?isSubCate=true">Balancaiga</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189401?isSubCate=true">Burberry</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/165624?isSubCate=true">Valentino</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/173451?isSubCate=true">Vercase</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181107?isSubCate=true">Prada</a>
+                    <a href="https://351164.x.yupoo.com/categories/265553?isSubCate=true">Hereme</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/172708?isSubCate=true">Cartier</a>
+                    <a href="https://351164.x.yupoo.com/categories/308729?isSubCate=true">APM Monaco</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187401?isSubCate=true">Tiffany & Co.</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/187553?isSubCate=true">MCQueen</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/181139?isSubCate=true">Celine</a>
+                    <a href="https://dongsheng851018.x.yupoo.com/categories/189420?isSubCate=true">Vivienne Westwood</a>
+                    
+                    
+                </div>
+        </div>  
+
+        <div class="category-wrapper">
+            <div class="category-item">
+                <span>Ear Ring</span>
+                <div class="dropdown-arrow"></div>
+            </div>
+            <div class="dropdown-links">
+                <a href="https://351164.x.yupoo.com/categories/83214?isSubCate=true">Louis Vuitton</a>
+                <a href="https://351164.x.yupoo.com/categories/460927?isSubCate=true">Gucci</a>
+                <a href="https://huali-1837.x.yupoo.com/categories/454554?isSubCate=true">DIOR</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/161599?isSubCate=true">Chanel</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/177655?isSubCate=true">Balancaiga</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/189399?isSubCate=true">Burberry</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/165620?isSubCate=true">Valentino</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/173449?isSubCate=true">Vercase</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/181104?isSubCate=true">Prada</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/172748?isSubCate=true">Hereme</a>
+                <a href="https://351164.x.yupoo.com/categories/435016?isSubCate=true">Cartier</a>
+                <a href="https://351164.x.yupoo.com/categories/308732?isSubCate=true">APM Monaco</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/187399?isSubCate=true">Tiffany & Co.</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/171128?isSubCate=true">Van Cleef & Arpeals</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/187551?isSubCate=true">MCQueen</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/181136?isSubCate=true">Celine</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/189418?isSubCate=true">Vivienne Westwood</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/188668?isSubCate=true">Dolce & Gabbana</a>
+                <a href="https://dongsheng851018.x.yupoo.com/categories/192438?isSubCate=true">Loewe</a>
+               
+                
+                
+            </div>
+    </div> 
+    
+    
+    <div class="category-wrapper">
+        <div class="category-item">
+            <span>Cap</span>
+            <div class="dropdown-arrow"></div>
+        </div>
+        <div class="dropdown-links">
+            <a href="https://mujichaopaia.x.yupoo.com/categories/3914065">many Brands</a>
+            <a href="https://poland13024664695.x.yupoo.com/categories/4149776">Baseball Cap</a>
+            <a href="https://poland13024664695.x.yupoo.com/categories/4144910">Bucket hat</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404441?isSubCate=true">Louis Vuitton</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404442?isSubCate=true">Gucci</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404443?isSubCate=true">DIOR</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404446?isSubCate=true">Burberry</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404447?isSubCate=true">Balancaiga</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404445?isSubCate=true">Prada</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404448?isSubCate=true">Chanel</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404450?isSubCate=true">Fendi</a>
+            <a href="https://alex8181688.x.yupoo.com/categories/404449?isSubCate=true">Celine</a>
+           
+   
+        </div>
+</div> 
+
+
+<div class="category-wrapper">
+    <div class="category-item">
+        <span>Belt</span>
+        <div class="dropdown-arrow"></div>
+    </div>
+    <div class="dropdown-links">
+        <a href="https://407131796.x.yupoo.com/categories/3133788">Many Brands</a>
+        <a href="https://vogue818.x.yupoo.com/categories/3997174">Louis Vuitton</a>
+        <a href="https://vogue818.x.yupoo.com/categories/3997173">Gucci</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274716?isSubCate=true">Gucci Man</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274717?isSubCate=true">Gucci Women</a>
+        <a href="https://vogue818.x.yupoo.com/categories/3997177">DIOR</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347207">Prada</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347199">Burberry</a>
+        <a href="https://vogue818.x.yupoo.com/categories/3997184">Montblanc</a>
+       
+        
+        
+    </div>
+</div> 
+
+<div class="category-wrapper">
+    <div class="category-item">
+        <span>Perfume</span>
+        <div class="dropdown-arrow"></div>
+    </div>
+    <div class="dropdown-links">
+        <a href="https://jypj.x.yupoo.com/categories/4530183">Many Brands</a>
+    </div>
+</div> 
+
+<div class="category-wrapper">
+    <div class="category-item">
+        <span>Sunglasses</span>
+        <div class="dropdown-arrow"></div>
+    </div>
+    <div class="dropdown-links">
+        <a href="https://alex8181688.x.yupoo.com/categories/404452?isSubCate=true">Louis Vuitton Men</a>
+        <a href="https://vogue818.x.yupoo.com/categories/117157?isSubCate=true">Louis Vuitton Women</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274730?isSubCate=true">Gucci Women</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274731?isSubCate=true">Gucci Men</a>
+        <a href="https://hotbags.x.yupoo.com/categories/122838">Prada</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347233">Hermes</a>
+        <a href="https://brandgift.x.yupoo.com/categories/4572784">Chanel</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347231">Balancaiga</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274728?isSubCate=true">Gayard Women</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/274729?isSubCate=true">Gayard Men</a>
+        <a href="https://jypj.x.yupoo.com/categories/4782483">Celine</a>
+        
+    </div>
+</div> 
+
+
+
+<div class="category-wrapper">
+    <div class="category-item">
+        <span>Scarf</span>
+        <div class="dropdown-arrow"></div>
+    </div>
+    <div class="dropdown-links">
+        <a href="https://vogue818.x.yupoo.com/categories/4010388">Many Brands</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347227">Louis Vuitton</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347229">Gucci</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347230">Burberry</a>
+        <a href="https://001qcshop.x.yupoo.com/categories/4347225">Hermes</a>
+        
+    </div>
+</div> 
+       
+        </div>
+
+        
+
+        
+        
+       
+    </div>
+
+    <script>
+        // Add click functionality to category items
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const wrapper = this.closest('.category-wrapper');
+                const dropdown = wrapper.querySelector('.dropdown-links');
+                const arrow = this.querySelector('.dropdown-arrow');
+                const isOpen = dropdown.classList.contains('open');
+
+                
+                document.querySelectorAll('.dropdown-links').forEach(otherDropdown => {
+                    if (otherDropdown !== dropdown) {
+                        otherDropdown.classList.remove('open');
+                        otherDropdown.closest('.category-wrapper').querySelector('.dropdown-arrow').classList.remove('open');
+                        otherDropdown.style.maxHeight = '0';
+                    }
+                });
+
+               
+                dropdown.classList.toggle('open');
+                arrow.classList.toggle('open');
+
+                if (dropdown.classList.contains('open')) {
+                    dropdown.style.maxHeight = dropdown.scrollHeight + 'px';
+                } else {
+                    dropdown.style.maxHeight = '0';
+                }
+            });
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(event) {
+                event.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                document.querySelectorAll('.category-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                document.getElementById(sectionId).classList.add('active');
+                
+                document.querySelectorAll('.dropdown-links').forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                    dropdown.style.maxHeight = '0';
+                });
+                document.querySelectorAll('.dropdown-arrow').forEach(arrow => {
+                    arrow.classList.remove('open');
+                });
+            });
+        });
+
+        document.querySelector('.share-btn').addEventListener('click', function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: "Angelia's Catalog",
+                    text: 'Check out this amazing catalog!',
+                    url: window.location.href
+                }).catch(err => {
+                    console.error('Share failed:', err);
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+            }
+        });
+    </script>
+</body>
+</html>
