@@ -1432,18 +1432,23 @@
             }
         });
     </script>
-   <script>
+  <script>
   // Disable right-click
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
   });
 
-  // Disable Ctrl+Shift+I
+  // Disable key shortcuts for dev tools
   document.addEventListener('keydown', function(e) {
-    if (
-      (e.ctrlKey && e.shiftKey && e.key === 'I') || // Ctrl+Shift+I
-      (e.ctrlKey && e.shiftKey && e.key === 'i')     // lowercase i
-    ) {
+    // Disable F12
+    if (e.key === 'F12' || e.keyCode === 123) {
+      e.preventDefault();
+    }
+
+    // Disable Ctrl+Shift+I or Ctrl+Shift+J
+    if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'i' || e.key === 'j')) ||
+        // Disable Ctrl+U
+        (e.ctrlKey && (e.key === 'U' || e.key === 'u'))) {
       e.preventDefault();
     }
   });
@@ -1452,5 +1457,6 @@
 </body>
 
 </html>
+
 
 
