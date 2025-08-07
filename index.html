@@ -1432,13 +1432,25 @@
             }
         });
     </script>
-    <script>
+   <script>
+  // Disable right-click
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
+  });
+
+  // Disable Ctrl+Shift+I
+  document.addEventListener('keydown', function(e) {
+    if (
+      (e.ctrlKey && e.shiftKey && e.key === 'I') || // Ctrl+Shift+I
+      (e.ctrlKey && e.shiftKey && e.key === 'i')     // lowercase i
+    ) {
+      e.preventDefault();
+    }
   });
 </script>
 
 </body>
 
 </html>
+
 
